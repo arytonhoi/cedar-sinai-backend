@@ -22,13 +22,6 @@ app.use(cors());
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 
-// swagger UI setup
-// const swaggerUi = require("swagger-ui-express");
-// const swaggerUi.setup(swaggerDocument);
-// const YAML = require("yamljs");
-// const swaggerDocument = YAML.load('./openapi.yaml');
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 const {
     getAllScreams,
     postOneScream,
@@ -48,7 +41,8 @@ const {
     markNotificationsRead,
 } = require("./handlers/users");
 const {
-    getAllFiles
+    getAllFiles,
+    getFile,
 } = require("./handlers/files");
 
 // Create and Deploy Your First Cloud Functions
@@ -81,7 +75,7 @@ app.post("/login", login);
 
 // file routes
 app.get("/files", FBAuth, getAllFiles);
-// app.get("/files/:fileId", FBAuth, getFile);
+app.get("/files/:fileId", FBAuth, getFile);
 // app.post("/folders/:folderId", FBAuth, createSubFolder);
 // app.delete("/folders/:folderId", FBAuth, deleteFolder);
 // app.get("/file/:fileId", FBAuth, getFileContents);
