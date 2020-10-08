@@ -73,6 +73,12 @@ exports.signup = (req, res) => {
 
 // log user in
 exports.login = (req, res) => {
+    try {
+        req.body = JSON.parse(req.rawBody.toString())
+    } catch (err) {
+        return res.status(400).json({ err: 'invalid json' });
+    }
+
     const user = {
         email: req.body.email,
         password: req.body.password,

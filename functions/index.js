@@ -48,22 +48,28 @@ const {
 // });
 
 // Scream routes
-app.get("/screams", getAllScreams);
-app.post("/scream", FBAuth, postOneScream);
-app.get("/scream/:screamId", getScream);
-app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
-app.get("/scream/:screamId/like", FBAuth, likeScream);
-app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
-app.delete("/scream/:screamId", FBAuth, deleteScream);
+// app.get("/screams", getAllScreams);
+// app.post("/scream", FBAuth, postOneScream);
+// app.get("/scream/:screamId", getScream);
+// app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
+// app.get("/scream/:screamId/like", FBAuth, likeScream);
+// app.get("/scream/:screamId/unlike", FBAuth, unlikeScream);
+// app.delete("/scream/:screamId", FBAuth, deleteScream);
+app.get("/folders/:folderId", FBAuth, getSubFolders);
+app.post("/folders/:folderId", FBAuth, createSubFolder);
+app.delete("/folders/:folderId", FBAuth, deleteFolder);
+app.get("/file/:fileId", FBAuth, getFileContents);
+app.patch("/file/:fileId", FBAuth, modifyFileContents);
+app.delete("/file/:fileId", FBAuth, deleteFile);
 
 // user routes
-app.post("/signup", signup);
+// app.post("/signup", signup);
 app.post("/login", login);
-app.post("/user/image", FBAuth, uploadImage);
-app.post("/user", FBAuth, addUserDetails);
-app.get("/user", FBAuth, getAuthenticatedUser);
-app.get("/user/:handle", getUserDetails);
-app.post("/notifications", FBAuth, markNotificationsRead);
+// app.post("/user/image", FBAuth, uploadImage);
+// app.post("/user", FBAuth, addUserDetails);
+// app.get("/user", FBAuth, getAuthenticatedUser);
+// app.get("/user/:handle", getUserDetails);
+// app.post("/notifications", FBAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
 exports.createNotificationOnLike = functions
