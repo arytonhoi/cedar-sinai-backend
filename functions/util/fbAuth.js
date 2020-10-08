@@ -24,8 +24,13 @@ module.exports = FBAuth = (req, res, next) => {
                 .get();
         })
         .then((data) => {
-            req.user.handle = data.docs[0].data().handle;
-            req.user.imageUrl = data.docs[0].data().imageUrl;
+            if (data.docs.length < 1) {
+                console.error("User doesn't exist in database");
+                return res.status(403).json({ error: "User doesn't exist" });
+            }
+            // req.user.handle = data.docs[0].data().handle;
+            // req.user.imageUrl = data.docs[0].data().imageUrl;
+            req.user.isAdmin = data.docs[0].data().isAdmin;
             return next();
         })
         .catch((err) => {

@@ -79,8 +79,9 @@ exports.login = (req, res) => {
         return res.status(400).json({ err: 'invalid json' });
     }
 
+    // turn username into email
     const user = {
-        email: req.body.email,
+        email: req.body.username.concat("@email.com"),
         password: req.body.password,
     };
 

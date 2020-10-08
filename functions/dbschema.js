@@ -46,19 +46,19 @@ let db = {
     ],
     files: [
         {
+            fileId: "home",
             metadata: {
-                filesId: "jfdajf;alkfjda",
                 fileType: "folder",
+                parentFile: "home",
             },
-            parentFile: "home",
             subfiles: ["fdafa", "pooio"],
         },
         {
+            fileId: "jfdajf;alkfjda",
             metadata: {
-                filesId: "jfdajf;alkfjda",
                 fileType: "content",
+                parentFile: "home",
             },
-            parentFile: "home",
             subfiles: ["fdafa", "pooio"],
             content: [
                 {
