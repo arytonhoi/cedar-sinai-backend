@@ -1,0 +1,264 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Cedars Sinai backend API
+  description: |
+    API for Cedars Sinai backend - mainly for development use
+servers:
+  - url: /api
+    description: testing server
+  - url: http://localhost:5000/fir-db-d2d47/us-central1/api
+    description: localhost server
+  - url: https://us-central1-fir-db-d2d47.cloudfunctions.net/api
+    description: production server
+security:
+  - Jwt: []
+  - Token: []
+
+x-common-definitions:
+  # This serves to centralize common definitions. Which we can then use to share between path and
+  # query parameters for example
+  guid: &guid_def
+    type: string
+    format: uuuid
+    maxLength: 36
+  folder_guid: &folder_guid_def
+    << : *guid_def
+    description: GUID of the folder
+  relationship_type: &rel_type
+    type: string
+    enum: ['bitsight', 'self', 'none']
+    description: >
+      the type of this fourth-party relationship.  'bitsight' if the relationship came from
+      BitSight's data, 'self' if the relationship was entered by a user, and 'none' if there is not
+      yet a relationship with this fourth party
+  default_read_errors:
+    &default_read_errors # The typical errors we might return on a simple read operation
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/PermissionDenied'
+    '404':
+      $ref: '#/components/responses/NotFound'
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  default_write_errors:
+    &default_write_errors # The typical errors we might return on a write, or complexly parameterised, operation
+    '400':
+      $ref: '#/components/responses/BadData'
+    '401':
+      $ref: '#/components/responses/Unauthorized'
+    '403':
+      $ref: '#/components/responses/PermissionDenied'
+    '404':
+      $ref: '#/components/responses/NotFound'
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+paths:
+  /files:
+    get:
+      tags:
+        - Files
+      description: Get list of all files
+      operationId: getAllFiles
+      responses:
+        <<: *default_read_errors
+        '200':
+          description: List of all files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+  /files/{fileId}:
+    get:
+      tags:
+        - Files
+      description: Get a specified file and its subfiles
+      operationId: getFile
+      parameters:
+        - name: fileId
+          description: id of the file you want
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        <<: *default_read_errors
+        '200':
+          description: List of all files
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+  /login:
+    post:
+      tags:
+        - Authentication
+      description: login using username and password to get an API token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  description: The details of the Vendor Access Request to create
+                  type: string
+                password:
+                  description: The details of the Vendor Access Request to create
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        <<: *default_write_errors
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    description: API token for authentication
+                    type: string
+
+components:
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        title:
+          type: string
+          description: basic error description
+        status:
+          type: integer
+          format: int32
+          description: HTTP error code
+        detail:
+          type: string
+          description: the detail about the error
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+    File:
+      type: object
+      properties:
+        fileId:
+          description: id of the file
+          type: string
+        metadata:
+          description: file metadata
+          type: object
+          properties:
+            fileType:
+              description: type of file (eg. folder, pdf, content)
+              type: string
+            parentFile:
+              description: file id of the parent file
+              type: string
+            createdAt:
+              description: date of file creation
+              type: string
+              format: date-time
+        subfileIds:
+          description: list of subfile ids
+          type: array
+          items:
+            type: string
+        subfileContents:
+          description: optional list of actual subfile contents
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+        contents:
+          oneOf:
+            - type: object
+              description: folder content
+              properties:
+                subfileIds:
+                  type: array
+                  items:
+                    type: string
+                subfileContents:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/File"
+            - type: object
+              description: pdf file content
+              properties:
+                link:
+                  description: link to pdf file
+                  type: string
+                caption:
+                  description: caption for the pdf
+                  type: string
+                thumbnailImgUrl:
+                  description: link for the pdf thumbnail
+                  type: string
+            - type: array
+              description: text document file content
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/File"
+                  - type: object
+                    properties:
+                      contentType:
+                        description: Type of content (eg. text, link, image)
+                        type: string
+                      style:
+                        description: style of the text
+                        type: string
+                      content:
+                        description: actual text content
+                        type: string
+
+  responses:
+    BadData:
+      description: Bad data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    PermissionDenied:
+      description: Permission Denied for this action
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  securitySchemes:
+    Token:
+      type: http
+      scheme: basic
+    Jwt:
+      type: apiKey
+      in: header
+      name: Authorization

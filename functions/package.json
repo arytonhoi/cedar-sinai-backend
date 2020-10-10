@@ -17,7 +17,8 @@
     "firebase": "^7.21.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.11.0",
-    "http-proxy-middleware": "^1.0.5"
+    "http-proxy-middleware": "^1.0.5",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"

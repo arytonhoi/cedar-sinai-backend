@@ -22,35 +22,52 @@ app.use(cors());
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 
+// const {
+//     getAllScreams,
+//     postOneScream,
+//     getScream,
+//     commentOnScream,
+//     likeScream,
+//     unlikeScream,
+//     deleteScream,
+// } = require("./handlers/screams");
 const {
-    getAllScreams,
-    postOneScream,
-    getScream,
-    commentOnScream,
-    likeScream,
-    unlikeScream,
-    deleteScream,
-} = require("./handlers/screams");
-const {
-    signup,
     login,
-    uploadImage,
-    addUserDetails,
-    getAuthenticatedUser,
-    getUserDetails,
-    markNotificationsRead,
 } = require("./handlers/users");
 const {
     getAllFiles,
     getFile,
+    createFile,
+    deleteFile,
 } = require("./handlers/files");
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
+exports.api = functions.https.onRequest(app);
+
+
+
+// NEW ROUTES
+// Swagger UI route
+
+// user routes
+app.post("/login", login);
+
+// file routes
+app.get("/files", FBAuth, getAllFiles);
+app.get("/files/:fileId", FBAuth, getFile);
+app.post("/files/:fileId", FBAuth, createFile);
+app.delete("/files/:fileId", FBAuth, deleteFile);
+// app.patch("/files/:fileId", FBAuth, modifyFileContents);
+
+// =============================================================================
+// OLD CODE
+// =============================================================================
+
 // OLD ROUTES
 // Scream routes
-app.get("/screams", FBAuth, getAllScreams);
+// app.get("/screams", FBAuth, getAllScreams);
 // app.post("/scream", FBAuth, postOneScream);
 // app.get("/scream/:screamId", getScream);
 // app.post("/scream/:screamId/comment", FBAuth, commentOnScream);
@@ -67,22 +84,6 @@ app.get("/screams", FBAuth, getAllScreams);
 // app.get("/user/:handle", getUserDetails);
 // app.post("/notifications", FBAuth, markNotificationsRead);
 
-// NEW ROUTES
-// Swagger UI route
-
-// user routes
-app.post("/login", login);
-
-// file routes
-app.get("/files", FBAuth, getAllFiles);
-app.get("/files/:fileId", FBAuth, getFile);
-// app.post("/folders/:folderId", FBAuth, createSubFolder);
-// app.delete("/folders/:folderId", FBAuth, deleteFolder);
-// app.get("/file/:fileId", FBAuth, getFileContents);
-// app.patch("/file/:fileId", FBAuth, modifyFileContents);
-// app.delete("/file/:fileId", FBAuth, deleteFile);
-
-exports.api = functions.https.onRequest(app);
 // exports.createNotificationOnLike = functions
 //     .region("us-central1")
 //     .firestore.document("likes/{id}")

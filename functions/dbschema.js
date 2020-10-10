@@ -1,3 +1,6 @@
+// Database design
+// https://firebase.google.com/docs/database/web/structure-data#avoid_nesting_data
+
 let db = {
     // users: [
     //     {
@@ -40,43 +43,90 @@ let db = {
     // ]
     users: [
         {
-            username: "admin",
+            userId: "rureqeqr",
+            email: "admin@email.com",
             isAdmin: true,
         },
     ],
     files: [
         {
             fileId: "home",
-            metadata: {
-                fileType: "folder",
-                parentFile: "home",
-            },
-            subfiles: ["fdafa", "pooio"],
+            type: "folder",
+            parent: "home",
+            createdAt: "2020-09-18T13:49:18.602Z",
+            lastModified: "2020-09-18T13:49:18.602Z",
+            title: "Home folder",
+            // content: [
+            //     {
+            //         fileId: "pdf1",
+            //         type: "pdf",
+            //         createdAt: "2020-09-18T13:49:18.602Z",
+            //         lastModified: "2020-09-18T13:49:18.602Z",
+            //         title: "First pdf",
+            //         link: "file.pdf",
+            //         caption: "this is a pdf caption",
+            //         thumbnailImgUrl: "thumbnail.jpg",
+            //     },
+            //     {
+            //         fileId: "folder2",
+            //         type: "folder",
+            //         createdAt: "2020-09-18T13:49:18.602Z",
+            //         lastModified: "2020-09-18T13:49:18.602Z",
+            //     }
+            // ],
         },
         {
-            fileId: "jfdajf;alkfjda",
-            metadata: {
-                fileType: "content",
-                parentFile: "home",
-            },
-            subfiles: ["fdafa", "pooio"],
+            fileId: "folder2",
+            type: "folder",
+            parent: "home",
+            createdAt: "2020-09-18T13:49:18.602Z",
+            lastModified: "2020-09-18T13:49:18.602Z",
+            title: "Folder 2",
+            // content: [
+            //     {
+            //         fileId: "document1",
+            //         type: "document",
+            //         createdAt: "2020-09-18T13:49:18.602Z",
+            //         lastModified: "2020-09-18T13:49:18.602Z",
+            //         title: "My First Document",
+            //     },
+            // ],
+        },
+        {
+            fileId: "pdf1",
+            type: "pdf",
+            parent: "home",
+            createdAt: "2020-09-18T13:49:18.602Z",
+            lastModified: "2020-09-18T13:49:18.602Z",
+            title: "First pdf",
+            link: "file.pdf",
+            caption: "this is a pdf caption",
+            thumbnailImgUrl: "thumbnail.jpg",
+        },
+        {
+            fileId: "document1",
+            type: "document",
+            parent: "folder2",
+            createdAt: "2020-09-18T13:49:18.602Z",
+            lastModified: "2020-09-18T13:49:18.602Z",
+            title: "My First Document",
             content: [
                 {
-                    contentType: "text",
+                    type: "text",
                     style: "h1",
                     content: "hello world h1",
                 },
                 {
-                    contentType: "text",
-                    style: "p",
-                    content: "hello world p",
+                    type: "image",
+                    caption: "this is an image",
+                    content: "image.jpg",
                 },
                 {
-                    contentType: "video",
+                    type: "video",
                     caption: "this is a video",
                     content: "video.mp4",
                 },
-            ]
+            ],
         },
     ],
 };
