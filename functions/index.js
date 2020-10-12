@@ -22,18 +22,10 @@ app.use(cors());
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 
-// const {
-//     getAllScreams,
-//     postOneScream,
-//     getScream,
-//     commentOnScream,
-//     likeScream,
-//     unlikeScream,
-//     deleteScream,
-// } = require("./handlers/screams");
 const {
     login,
 } = require("./handlers/users");
+
 const {
     getAllFiles,
     getFile,
@@ -41,12 +33,24 @@ const {
     deleteFile,
 } = require("./handlers/files");
 
+const {
+    getAllAnnouncements,
+    postOneAnnouncement,
+    deleteOneAnnouncement,
+    // updateOneAnnouncement,
+} = require("./handlers/announcements");
+
+const {
+    getAllSchedules,
+    postOneSchedule,
+    deleteOneSchedule,
+} = require("./handlers/schedules");
+
+
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
 
 exports.api = functions.https.onRequest(app);
-
-
 
 // NEW ROUTES
 // Swagger UI route
@@ -60,6 +64,18 @@ app.get("/files/:fileId", FBAuth, getFile);
 app.post("/files/:fileId", FBAuth, createFile);
 app.delete("/files/:fileId", FBAuth, deleteFile);
 // app.patch("/files/:fileId", FBAuth, modifyFileContents);
+
+// announcement routes
+app.get("/announcements", FBAuth, getAllAnnouncements);
+app.post("/announcements", FBAuth, postOneAnnouncement);
+app.delete("/announcements/:announcementId", FBAuth, deleteOneAnnouncement);
+// app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
+
+// schedule routes
+app.get("/schedules", FBAuth, getAllSchedules);
+app.post("/schedules", FBAuth, postOneSchedule);
+app.delete("/schedules/:scheduleId", FBAuth, deleteOneSchedule);
+// app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
 
 // =============================================================================
 // OLD CODE

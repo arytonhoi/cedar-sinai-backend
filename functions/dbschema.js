@@ -106,7 +106,7 @@ let db = {
     {
       announcementId: "announcement1",
       title: "First Announcement",
-      date: "2020-09-18T13:49:18.602Z",
+      createdAt: "2020-09-18T13:49:18.602Z",
       isPinned: false,
       author: "Krystal",
       content: "This is my first announcement!",
@@ -116,7 +116,7 @@ let db = {
     {
       scheduleId: "schedule1",
       title: "October 2020 Schedule",
-      date: "2020-09-18T13:49:18.602Z",
+      createdAt: "2020-09-18T13:49:18.602Z",
       content: "schedule.pdf",
       comments: "schedule subject to change",
     },
