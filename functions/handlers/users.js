@@ -1,4 +1,5 @@
 const { admin, db } = require("../util/admin");
+const { fixFormat } = require("../util/shim");
 
 const firebaseConfig = require("../util/config");
 const firebase = require("firebase");
@@ -12,12 +13,7 @@ const {
 
 // log user in
 exports.login = (req, res) => {
-    try {
-        req.body = JSON.parse(req.rawBody.toString());
-    } catch (err) {
-        return res.status(400).json({ err: "invalid json" });
-    }
-
+    try{req = fixFormat(req)}catch(e){return res.status(400).json({error: "Invalid JSON."})}
     // turn username into email
     const user = {
         email: req.body.username.concat("@email.com"),

@@ -1,11 +1,11 @@
 const { db } = require("../util/admin");
+const { fixFormat } = require("../util/shim");
 
 // get all announcements in database
 exports.getAllSchedules = (req, res) => {
     if (req.method !== "GET") {
         return res.status(400).json({ error: "Method not allowed" });
     }
-
     db.collection("schedules")
         .orderBy("createdAt", "desc")
         .get()
@@ -32,7 +32,7 @@ exports.postOneSchedule = (req, res) => {
     } else if (req.method !== "POST") {
         return res.status(400).json({ error: "Method not allowed" });
     }
-
+    try{req = fixFormat(req)}catch(e){return res.status(400).json({error: "Invalid JSON."})}
     // move request params to JS object newFIle
     const newSchedule = {
         title: req.body.title,
@@ -58,7 +58,6 @@ exports.deleteOneSchedule = (req, res) => {
     if (!req.user.isAdmin) {
         return res.status(403).json({ error: "Unathorized" });
     }
-
     const schedule = db.doc(`/schedules/${req.params.scheduleId}`);
     schedule.get()
         .then(doc => {
