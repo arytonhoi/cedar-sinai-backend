@@ -41,10 +41,24 @@ const {
 } = require("./handlers/announcements");
 
 const {
-    getAllSchedules,
-    postOneSchedule,
-    deleteOneSchedule,
-} = require("./handlers/schedules");
+    getAllDepartments,
+    postOneDepartment,
+    deleteOneDepartment,
+    // updateOneDepartment,
+} = require("./handlers/departments");
+
+const {
+    getAllContacts,
+    postOneContact,
+    deleteOneContact,
+    // updateOneContact,
+} = require("./handlers/contacts");
+
+// const {
+//     getAllSchedules,
+//     postOneSchedule,
+//     deleteOneSchedule,
+// } = require("./handlers/schedules");
 
 
 // Create and Deploy Your First Cloud Functions
@@ -71,12 +85,23 @@ app.post("/announcements", FBAuth, postOneAnnouncement);
 app.delete("/announcements/:announcementId", FBAuth, deleteOneAnnouncement);
 // app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
 
+// contacts
+app.get("/departments", FBAuth, getAllDepartments);
+app.post("/departments", FBAuth, postOneDepartment);
+app.delete("/departments/:departmentId", FBAuth, deleteOneDepartment);
+// app.patch("/departments/:departmentId", FBAuth, updateOneDepartment);
+app.get("/contacts", FBAuth, getAllContacts);
+app.post("/contacts", FBAuth, postOneContact);
+app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
+// app.patch("/contacts/:contactId", FBAuth, updateOneContact);
+
 // schedule routes
-app.get("/schedules", FBAuth, getAllSchedules);
-app.post("/schedules", FBAuth, postOneSchedule);
-app.delete("/schedules/:scheduleId", FBAuth, deleteOneSchedule);
+// app.get("/schedules", FBAuth, getAllSchedules);
+// app.post("/schedules", FBAuth, postOneSchedule);
+// app.delete("/schedules/:scheduleId", FBAuth, deleteOneSchedule);
 // app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
 
+// 
 // =============================================================================
 // OLD CODE
 // =============================================================================
