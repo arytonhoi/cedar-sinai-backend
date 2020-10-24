@@ -1,11 +1,12 @@
-const { db } = require("../util/admin");
+const { db } = require("../util/admin")
+const { fixFormat } = require("../util/shim");
+
 
 // get all announcements in database
 exports.getAllAnnouncements = (req, res) => {
     if (req.method !== "GET") {
         return res.status(400).json({ error: "Method not allowed" });
     }
-
     db.collection("announcements")
         .orderBy("createdAt", "desc")
         .get()
@@ -26,6 +27,7 @@ exports.getAllAnnouncements = (req, res) => {
 
 // create file
 exports.postOneAnnouncement = (req, res) => {
+    try{req = fixFormat(req)}catch(e){return res.status(400).json({error: "Invalid JSON."})}
     console.log(req.user.isAdmin)
     if (!req.user.isAdmin) {
         return res.status(403).json({ error: "Unathorized" });

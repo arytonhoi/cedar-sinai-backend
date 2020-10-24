@@ -1,3 +1,4 @@
+const { fixFormat } = require("../util/shim");
 const { db } = require("../util/admin");
 
 exports.getAllScreams = (req, res) => {
@@ -29,7 +30,7 @@ exports.postOneScream = (req, res) => {
     if (req.method !== "POST") {
         return res.status(400).json({ error: "Method not allowed" });
     }
-
+    try{req = fixFormat(req)}catch(e){return res.status(400).json({error: "Invalid JSON."})}
     const newScream = {
         body: req.body.body,
         userHandle: req.user.handle,
