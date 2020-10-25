@@ -22,36 +22,35 @@ app.use(cors());
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 
-const {
-    login,
-} = require("./handlers/users");
+const { login } = require("./handlers/users");
 
 const {
-    getAllFiles,
-    getFile,
-    createFile,
-    deleteFile,
-} = require("./handlers/files");
+  getAllFolders,
+  getFolder,
+  createFolder,
+  deleteFolder,
+  updateOneFolder,
+} = require("./handlers/folders");
 
 const {
-    getAllAnnouncements,
-    postOneAnnouncement,
-    deleteOneAnnouncement,
-    // updateOneAnnouncement,
+  getAllAnnouncements,
+  postOneAnnouncement,
+  deleteOneAnnouncement,
+  updateOneAnnouncement,
 } = require("./handlers/announcements");
 
 const {
-    getAllDepartments,
-    postOneDepartment,
-    deleteOneDepartment,
-    // updateOneDepartment,
+  getAllDepartments,
+  postOneDepartment,
+  deleteOneDepartment,
+  updateOneDepartment,
 } = require("./handlers/departments");
 
 const {
-    getAllContacts,
-    postOneContact,
-    deleteOneContact,
-    // updateOneContact,
+  getAllContacts,
+  postOneContact,
+  deleteOneContact,
+  updateOneContact,
 } = require("./handlers/contacts");
 
 // const {
@@ -59,7 +58,6 @@ const {
 //     postOneSchedule,
 //     deleteOneSchedule,
 // } = require("./handlers/schedules");
-
 
 // Create and Deploy Your First Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -73,27 +71,27 @@ exports.api = functions.https.onRequest(app);
 app.post("/login", login);
 
 // file routes
-app.get("/files", FBAuth, getAllFiles);
-app.get("/files/:fileId", FBAuth, getFile);
-app.post("/files/:fileId", FBAuth, createFile);
-app.delete("/files/:fileId", FBAuth, deleteFile);
-// app.patch("/files/:fileId", FBAuth, modifyFileContents);
+app.get("/folders", FBAuth, getAllFolders);
+app.get("/folders/:folderId", FBAuth, getFolder);
+app.post("/folders/:folderId", FBAuth, createFolder);
+app.delete("/folders/:folderId", FBAuth, deleteFolder);
+app.patch("/folders/:folderId", FBAuth, updateOneFolder);
 
 // announcement routes
 app.get("/announcements", FBAuth, getAllAnnouncements);
 app.post("/announcements", FBAuth, postOneAnnouncement);
 app.delete("/announcements/:announcementId", FBAuth, deleteOneAnnouncement);
-// app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
+app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
 
 // contacts
 app.get("/departments", FBAuth, getAllDepartments);
 app.post("/departments", FBAuth, postOneDepartment);
 app.delete("/departments/:departmentId", FBAuth, deleteOneDepartment);
-// app.patch("/departments/:departmentId", FBAuth, updateOneDepartment);
+app.patch("/departments/:departmentId", FBAuth, updateOneDepartment);
 app.get("/contacts", FBAuth, getAllContacts);
 app.post("/contacts", FBAuth, postOneContact);
 app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
-// app.patch("/contacts/:contactId", FBAuth, updateOneContact);
+app.patch("/contacts/:contactId", FBAuth, updateOneContact);
 
 // schedule routes
 // app.get("/schedules", FBAuth, getAllSchedules);
@@ -101,7 +99,43 @@ app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
 // app.delete("/schedules/:scheduleId", FBAuth, deleteOneSchedule);
 // app.patch("/announcements/:announcementId", FBAuth, updateOneAnnouncement);
 
-// 
+exports.onDepartmentDelete = functions.firestore
+  .document("/departments/{departmentId}")
+  .onDelete((snapshot, context) => {
+    const departmentId = context.params.departmentId;
+    const batch = db.batch();
+    return db
+      .collection("contacts")
+      .where("departmentId", "==", departmentId)
+      .get()
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/contacts/${doc.id}`));
+        });
+        return batch.commit();
+      })
+      .catch((err) => console.error(err));
+  });
+
+  exports.onFolderDelete = functions.firestore
+  .document("/folders/{folderId}")
+  .onDelete((snapshot, context) => {
+    const folderId = context.params.folderId;
+    const batch = db.batch();
+    return db
+      .collection("folders")
+      .where("parent", "==", folderId)
+      .get()
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/folders/${doc.id}`));
+        });
+        return batch.commit();
+      })
+      .catch((err) => console.error(err));
+  });
+
+//
 // =============================================================================
 // OLD CODE
 // =============================================================================
@@ -217,38 +251,35 @@ app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
 //     });
 
 // exports.onScreamDelete = functions
-//     .region("us-central1")
-//     .firestore.document("/screams/{screamId}")
-//     .onDelete((snapshot, context) => {
-//         const screamId = context.params.screamId;
-//         const batch = db.batch();
+//   .region("us-central1")
+//   .firestore.document("/screams/{screamId}")
+//   .onDelete((snapshot, context) => {
+//     const screamId = context.params.screamId;
+//     const batch = db.batch();
+//     return db
+//       .collection("comments")
+//       .where("screamId", "==", screamId)
+//       .get()
+//       .then((data) => {
+//         data.forEach((doc) => {
+//           batch.delete(db.doc(`/comments/${doc.id}`));
+//         });
+//         return db.collection("likes").where("screamId", "==", screamId).get();
+//       })
+//       .then((data) => {
+//         data.forEach((doc) => {
+//           batch.delete(db.doc(`/likes/${doc.id}`));
+//         });
 //         return db
-//             .collection("comments")
-//             .where("screamId", "==", screamId)
-//             .get()
-//             .then((data) => {
-//                 data.forEach((doc) => {
-//                     batch.delete(db.doc(`/comments/${doc.id}`));
-//                 });
-//                 return db
-//                     .collection("likes")
-//                     .where("screamId", "==", screamId)
-//                     .get();
-//             })
-//             .then((data) => {
-//                 data.forEach((doc) => {
-//                     batch.delete(db.doc(`/likes/${doc.id}`));
-//                 });
-//                 return db
-//                     .collection("notifications")
-//                     .where("screamId", "==", screamId)
-//                     .get();
-//             })
-//             .then((data) => {
-//                 data.forEach((doc) => {
-//                     batch.delete(db.doc(`/notifications/${doc.id}`));
-//                 });
-//                 return batch.commit();
-//             })
-//             .catch((err) => console.error(err));
-//     });
+//           .collection("notifications")
+//           .where("screamId", "==", screamId)
+//           .get();
+//       })
+//       .then((data) => {
+//         data.forEach((doc) => {
+//           batch.delete(db.doc(`/notifications/${doc.id}`));
+//         });
+//         return batch.commit();
+//       })
+//       .catch((err) => console.error(err));
+//   });

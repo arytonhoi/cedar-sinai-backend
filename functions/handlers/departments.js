@@ -1,22 +1,21 @@
 const { db } = require("../util/admin");
 const { fixFormat } = require("../util/shim");
 
-// get all announcements in database
-exports.getAllAnnouncements = (req, res) => {
+// get all departments in database
+exports.getAllDepartments = (req, res) => {
   if (req.method !== "GET") {
     return res.status(400).json({ error: "Method not allowed" });
   }
-  db.collection("announcements")
-    .orderBy("createdAt", "desc")
+  db.collection("departments")
     .get()
     .then((data) => {
-      let announcements = [];
+      let departments = [];
       data.forEach((doc) => {
-        let announcement = doc.data();
-        announcement.announcementId = doc.id;
-        announcements.push(announcement);
+        let department = doc.data();
+        department.departmentId = doc.id;
+        departments.push(department);
       });
-      return res.json(announcements);
+      return res.json(departments);
     })
     .catch((err) => {
       console.error(err);
@@ -25,7 +24,7 @@ exports.getAllAnnouncements = (req, res) => {
 };
 
 // create file
-exports.postOneAnnouncement = (req, res) => {
+exports.postOneDepartment = (req, res) => {
   try {
     req = fixFormat(req);
   } catch (e) {
@@ -39,20 +38,16 @@ exports.postOneAnnouncement = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newAnn = {
-    title: req.body.title,
-    author: req.body.author,
-    createdAt: new Date().toISOString(),
-    isPinned: req.body.isPinned,
-    content: req.body.content,
+  const newDepartment = {
+    name: req.body.name
   };
 
   // add newAnn to FB database and update parent folder
-  db.collection("announcements")
-    .add(newAnn)
+  db.collection("departments")
+    .add(newDepartment)
     .then((doc) => {
-      newAnn.announcementId = doc.id;
-      res.json(newAnn);
+      newDepartment.departmentId = doc.id;
+      res.json(newDepartment);
     })
     .catch((err) => {
       console.error(err);
@@ -60,23 +55,23 @@ exports.postOneAnnouncement = (req, res) => {
     });
 };
 
-exports.deleteOneAnnouncement = (req, res) => {
+exports.deleteOneDepartment = (req, res) => {
   if (!req.user.isAdmin) {
-    return res.status(403).json({ error: "Unathorized" });
+    return res.status(403).json({ error: "Unauthorized" });
   }
 
-  const announcement = db.doc(`/announcements/${req.params.announcementId}`);
-  announcement
+  const department = db.doc(`/departments/${req.params.departmentId}`);
+  department
     .get()
     .then((doc) => {
       if (!doc.exists) {
-        return res.status(404).json({ error: "Announcement doesn't exist" });
+        return res.status(404).json({ error: "department doesn't exist" });
       } else {
-        return announcement.delete();
+        return department.delete();
       }
     })
     .then(() => {
-      res.json({ message: "Announcement deleted successfully" });
+      res.json({ message: "department deleted successfully" });
     })
     .catch((err) => {
       console.error(err);
@@ -84,23 +79,20 @@ exports.deleteOneAnnouncement = (req, res) => {
     });
 };
 
-exports.updateOneAnnouncement = (req, res) => {
+exports.updateOneDepartment = (req, res) => {
   try {
     req = fixFormat(req);
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  const updatedAnnouncement = {
-    author: req.body.author,
-    title: req.body.title,
-    isPinned: req.body.isPinned,
-    content: req.body.content
+  const updatedDepartment = {
+    name: req.body.name,
   };
 
-  db.doc(`/announcements/${req.params.announcementId}`)
-    .update(updatedAnnouncement)
+  db.doc(`/departments/${req.params.departmentId}`)
+    .update(updatedDepartment)
     .then(() => {
-      return res.json({ message: "Announcement updated successfully " });
+      return res.json({ message: "Department updated successfully " });
     })
     .catch((err) => {
       console.error(err);

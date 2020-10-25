@@ -6,47 +6,51 @@ const firebase = require("firebase");
 firebase.initializeApp(firebaseConfig);
 
 const {
-    validateSignupData,
-    validateLoginData,
-    reduceUserDetails,
+  validateSignupData,
+  validateLoginData,
+  reduceUserDetails,
 } = require("../util/validators");
 
 // log user in
 exports.login = (req, res) => {
-    try{req = fixFormat(req)}catch(e){return res.status(400).json({error: "Invalid JSON."})}
-    // turn username into email
-    const user = {
-        email: req.body.username.concat("@email.com"),
-        password: req.body.password,
-    };
+  try {
+    req = fixFormat(req);
+  } catch (e) {
+    return res.status(400).json({ error: "Invalid JSON." });
+  }
+  // turn username into email
+  const user = {
+    email: req.body.username.concat("@email.com"),
+    password: req.body.password,
+  };
 
-    // validate data
-    const { valid, errors } = validateLoginData(user);
-    if (!valid) return res.status(400).json(errors);
+  // validate data
+  const { valid, errors } = validateLoginData(user);
+  if (!valid) return res.status(400).json(errors);
 
-    firebase
-        .auth()
-        .signInWithEmailAndPassword(user.email, user.password)
-        .then((data) => {
-            return data.user.getIdToken();
-        })
-        .then((token) => {
-            return res.json({ token });
-        })
-        .catch((err) => {
-            console.error(err);
-            if (err.code === "auth/wrong-password") {
-                return res
-                    .status(403)
-                    .json({ general: "Wrong password, please try again" });
-            } else if (err.code === "auth/user-not-found") {
-                return res
-                    .status(403)
-                    .json({ general: "Wrong username, please try again" });
-            } else {
-                return res.status(500).json({ error: err.code });
-            }
-        });
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(user.email, user.password)
+    .then((data) => {
+      return data.user.getIdToken();
+    })
+    .then((token) => {
+      return res.json({ token });
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.code === "auth/wrong-password") {
+        return res
+          .status(403)
+          .json({ general: "Wrong password, please try again" });
+      } else if (err.code === "auth/user-not-found") {
+        return res
+          .status(403)
+          .json({ general: "Wrong username, please try again" });
+      } else {
+        return res.status(500).json({ error: err.code });
+      }
+    });
 };
 
 // exports.signup = (req, res) => {

@@ -1,22 +1,21 @@
 const { db } = require("../util/admin");
 const { fixFormat } = require("../util/shim");
 
-// get all announcements in database
-exports.getAllAnnouncements = (req, res) => {
+// get all contacts in database
+exports.getAllContacts = (req, res) => {
   if (req.method !== "GET") {
     return res.status(400).json({ error: "Method not allowed" });
   }
-  db.collection("announcements")
-    .orderBy("createdAt", "desc")
+  db.collection("contacts")
     .get()
     .then((data) => {
-      let announcements = [];
+      let contacts = [];
       data.forEach((doc) => {
-        let announcement = doc.data();
-        announcement.announcementId = doc.id;
-        announcements.push(announcement);
+        let contact = doc.data();
+        contact.contactId = doc.id;
+        contacts.push(contact);
       });
-      return res.json(announcements);
+      return res.json(contacts);
     })
     .catch((err) => {
       console.error(err);
@@ -25,7 +24,7 @@ exports.getAllAnnouncements = (req, res) => {
 };
 
 // create file
-exports.postOneAnnouncement = (req, res) => {
+exports.postOneContact = (req, res) => {
   try {
     req = fixFormat(req);
   } catch (e) {
@@ -39,20 +38,20 @@ exports.postOneAnnouncement = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newAnn = {
-    title: req.body.title,
-    author: req.body.author,
-    createdAt: new Date().toISOString(),
-    isPinned: req.body.isPinned,
-    content: req.body.content,
+  const newContact = {
+    name: req.body.name,
+    imgUrl: req.body.imgUrl,
+    departmentId: req.body.departmentId,
+    phone: req.body.phone,
+    email: req.body.email,
   };
 
   // add newAnn to FB database and update parent folder
-  db.collection("announcements")
-    .add(newAnn)
+  db.collection("contacts")
+    .add(newContact)
     .then((doc) => {
-      newAnn.announcementId = doc.id;
-      res.json(newAnn);
+      newContact.contactId = doc.id;
+      res.json(newContact);
     })
     .catch((err) => {
       console.error(err);
@@ -60,23 +59,23 @@ exports.postOneAnnouncement = (req, res) => {
     });
 };
 
-exports.deleteOneAnnouncement = (req, res) => {
+exports.deleteOneContact = (req, res) => {
   if (!req.user.isAdmin) {
     return res.status(403).json({ error: "Unathorized" });
   }
 
-  const announcement = db.doc(`/announcements/${req.params.announcementId}`);
-  announcement
+  const contact = db.doc(`/contacts/${req.params.contactId}`);
+  contact
     .get()
     .then((doc) => {
       if (!doc.exists) {
-        return res.status(404).json({ error: "Announcement doesn't exist" });
+        return res.status(404).json({ error: "contact doesn't exist" });
       } else {
-        return announcement.delete();
+        return contact.delete();
       }
     })
     .then(() => {
-      res.json({ message: "Announcement deleted successfully" });
+      res.json({ message: "contact deleted successfully" });
     })
     .catch((err) => {
       console.error(err);
@@ -84,23 +83,24 @@ exports.deleteOneAnnouncement = (req, res) => {
     });
 };
 
-exports.updateOneAnnouncement = (req, res) => {
+exports.updateOneContact = (req, res) => {
   try {
     req = fixFormat(req);
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  const updatedAnnouncement = {
-    author: req.body.author,
-    title: req.body.title,
-    isPinned: req.body.isPinned,
-    content: req.body.content
+  const updatedContact = {
+    name: req.body.name,
+    imgUrl: req.body.imgUrl,
+    departmentId: req.body.departmentId,
+    phone: req.body.phone,
+    email: req.body.email,
   };
 
-  db.doc(`/announcements/${req.params.announcementId}`)
-    .update(updatedAnnouncement)
+  db.doc(`/contacts/${req.params.contactId}`)
+    .update(updatedContact)
     .then(() => {
-      return res.json({ message: "Announcement updated successfully " });
+      return res.json({ message: "Contact updated successfully " });
     })
     .catch((err) => {
       console.error(err);

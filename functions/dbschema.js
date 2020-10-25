@@ -119,7 +119,7 @@ let db = {
       createdAt: "2020-09-18T13:49:18.602Z",
       lastModified: "2020-09-18T13:49:18.602Z",
       title: "Home folder",
-      text: "Hello"
+      content: "Hello"
     },
     {
       folderId: "folder1",
@@ -157,10 +157,11 @@ let db = {
   ],
   departments: [
     {
-      departmentId: "Educators"
+      departmentId: "fdafdafdaf",
+      name: "educators"
     },
     {
-      departmentId: "Managers"
+      departmentId: "managers"
     },
   ],
   contacts: [
@@ -168,7 +169,7 @@ let db = {
       contactId: "490234090rf",
       name: "Krystal S Rodriguez",
       imgUrl: "idk.jog",
-      department: "Educators",
+      department: "educators",
       phone: "123 456 7890",
       email: "krystal@email.com"
     }
