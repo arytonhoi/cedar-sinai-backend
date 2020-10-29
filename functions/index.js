@@ -22,7 +22,7 @@ app.use(cors());
 const FBAuth = require("./util/fbAuth");
 const { db } = require("./util/admin");
 
-const { login } = require("./handlers/users");
+const { login, getAuthenticatedUser } = require("./handlers/users");
 
 const {
   getAllFolders,
@@ -69,6 +69,7 @@ exports.api = functions.https.onRequest(app);
 
 // user routes
 app.post("/login", login);
+app.get("/user", FBAuth, getAuthenticatedUser);
 
 // file routes
 app.get("/folders", FBAuth, getAllFolders);
@@ -117,7 +118,7 @@ exports.onDepartmentDelete = functions.firestore
       .catch((err) => console.error(err));
   });
 
-  exports.onFolderDelete = functions.firestore
+exports.onFolderDelete = functions.firestore
   .document("/folders/{folderId}")
   .onDelete((snapshot, context) => {
     const folderId = context.params.folderId;
