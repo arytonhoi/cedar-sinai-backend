@@ -12,7 +12,7 @@ exports.getAllDepartments = (req, res) => {
       let departments = [];
       data.forEach((doc) => {
         let department = doc.data();
-        department.departmentId = doc.id;
+        department.id = doc.id;
         departments.push(department);
       });
       return res.json(departments);
@@ -46,7 +46,7 @@ exports.postOneDepartment = (req, res) => {
   db.collection("departments")
     .add(newDepartment)
     .then((doc) => {
-      newDepartment.departmentId = doc.id;
+      newDepartment.id = doc.id;
       res.json(newDepartment);
     })
     .catch((err) => {

@@ -13,7 +13,7 @@ exports.getAllFolders = (req, res) => {
       let folders = [];
       data.forEach((doc) => {
         let folder = doc.data();
-        folder.folderId = doc.id;
+        folder.id = doc.id;
         folders.push(folder);
       });
       return res.json(folders);
@@ -37,12 +37,12 @@ exports.getFolder = (req, res) => {
         return res.status(404).json({ error: "Folder not found" });
       }
       folderData = doc.data();
-      folderData.folderId = doc.id;
+      folderData.id = doc.id;
       // get all folder contents
       return db
         .collection("folders")
         .orderBy("lastModified", "desc")
-        .where("parent", "==", folderData.folderId)
+        .where("parent", "==", folderData.id)
         .get();
     })
     .then((folderContents) => {
@@ -85,7 +85,7 @@ exports.createFolder = (req, res) => {
   db.collection("folders")
     .add(newFolder)
     .then((doc) => {
-      newFolder.folderId = doc.id;
+      newFolder.id = doc.id;
       res.json(newFolder);
     })
     .catch((err) => {

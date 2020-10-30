@@ -169,7 +169,7 @@ let db = {
       contactId: "490234090rf",
       name: "Krystal S Rodriguez",
       imgUrl: "idk.jog",
-      department: "educators",
+      departmentId: "fdafdafdaf",
       phone: "123 456 7890",
       email: "krystal@email.com"
     }

@@ -13,7 +13,7 @@ exports.getAllAnnouncements = (req, res) => {
       let announcements = [];
       data.forEach((doc) => {
         let announcement = doc.data();
-        announcement.announcementId = doc.id;
+        announcement.id = doc.id;
         announcements.push(announcement);
       });
       return res.json(announcements);
@@ -39,7 +39,7 @@ exports.postOneAnnouncement = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newAnn = {
+  const newAnnouncement = {
     title: req.body.title,
     author: req.body.author,
     createdAt: new Date().toISOString(),
@@ -47,12 +47,12 @@ exports.postOneAnnouncement = (req, res) => {
     content: req.body.content,
   };
 
-  // add newAnn to FB database and update parent folder
+  // add newAnnouncement to FB database and update parent folder
   db.collection("announcements")
-    .add(newAnn)
+    .add(newAnnouncement)
     .then((doc) => {
-      newAnn.announcementId = doc.id;
-      res.json(newAnn);
+      newAnnouncement.id = doc.id;
+      res.json(newAnnouncement);
     })
     .catch((err) => {
       console.error(err);

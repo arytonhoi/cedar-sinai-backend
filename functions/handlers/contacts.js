@@ -1,6 +1,83 @@
 const { db } = require("../util/admin");
 const { fixFormat } = require("../util/shim");
 
+// create file
+exports.postOneDepartment = (req, res) => {
+  try {
+    req = fixFormat(req);
+  } catch (e) {
+    return res.status(400).json({ error: "Invalid JSON." });
+  }
+  console.log(req.user.isAdmin);
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ error: "Unathorized" });
+  } else if (req.method !== "POST") {
+    return res.status(400).json({ error: "Method not allowed" });
+  }
+
+  // move request params to JS object newFIle
+  const newDepartment = {
+    name: req.body.name,
+  };
+
+  // add newAnn to FB database and update parent folder
+  db.collection("departments")
+    .add(newDepartment)
+    .then((doc) => {
+      newDepartment.departmentId = doc.id;
+      res.json(newDepartment);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "something went wrong" });
+    });
+};
+
+exports.deleteOneDepartment = (req, res) => {
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const department = db.doc(`/departments/${req.params.departmentId}`);
+  department
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).json({ error: "department doesn't exist" });
+      } else {
+        return department.delete();
+      }
+    })
+    .then(() => {
+      res.json({ message: "department deleted successfully" });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};
+
+exports.updateOneDepartment = (req, res) => {
+  try {
+    req = fixFormat(req);
+  } catch (e) {
+    return res.status(400).json({ error: "Invalid JSON." });
+  }
+  const updatedDepartment = {
+    name: req.body.name,
+  };
+
+  db.doc(`/departments/${req.params.departmentId}`)
+    .update(updatedDepartment)
+    .then(() => {
+      return res.json({ message: "Department updated successfully " });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};
+
 // get all contacts in database
 exports.getAllContacts = (req, res) => {
   if (req.method !== "GET") {
@@ -9,13 +86,13 @@ exports.getAllContacts = (req, res) => {
   db.collection("contacts")
     .get()
     .then((data) => {
-      let contacts = [];
+      let departments = [];
       data.forEach((doc) => {
-        let contact = doc.data();
-        contact.contactId = doc.id;
-        contacts.push(contact);
+        let department = doc.data();
+        department.departmentId = doc.id;
+        departments.push(department);
       });
-      return res.json(contacts);
+      return res.json(departments);
     })
     .catch((err) => {
       console.error(err);
@@ -30,7 +107,6 @@ exports.postOneContact = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  console.log(req.user.isAdmin);
   if (!req.user.isAdmin) {
     return res.status(403).json({ error: "Unathorized" });
   } else if (req.method !== "POST") {
@@ -39,9 +115,9 @@ exports.postOneContact = (req, res) => {
 
   // move request params to JS object newFIle
   const newContact = {
+    departmentId: req.body.departmentId,
     name: req.body.name,
     imgUrl: req.body.imgUrl,
-    departmentId: req.body.departmentId,
     phone: req.body.phone,
     email: req.body.email,
   };
@@ -50,7 +126,7 @@ exports.postOneContact = (req, res) => {
   db.collection("contacts")
     .add(newContact)
     .then((doc) => {
-      newContact.contactId = doc.id;
+      newContact.id = doc.id;
       res.json(newContact);
     })
     .catch((err) => {
