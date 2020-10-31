@@ -95,7 +95,7 @@ exports.getAuthenticatedUser = (req, res) => {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        userData.credentials = doc.data();
+        userData = doc.data();
         return res.json(userData);
       } else {
         return res.status(404).json({ error: "User not found" });
