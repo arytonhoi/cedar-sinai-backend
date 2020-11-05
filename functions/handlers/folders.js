@@ -49,7 +49,9 @@ exports.getFolder = (req, res) => {
       // add folder contents to folder object
       folderData.subfolders = [];
       folderContents.forEach((content) => {
-        folderData.subfolders.push(content.data());
+        let subfolder = content.data();
+        subfolder.id = content.id;
+        folderData.subfolders.push(subfolder);
       });
       return res.json(folderData);
     })
