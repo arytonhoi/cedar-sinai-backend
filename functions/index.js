@@ -36,6 +36,7 @@ const {
   postOneContact,
   deleteOneContact,
   updateOneContact,
+  uploadImage,
 } = require("./handlers/contacts");
 
 // Create and Deploy Your First Cloud Functions
@@ -71,6 +72,7 @@ app.get("/contacts", FBAuth, getAllContacts);
 app.post("/contacts", FBAuth, postOneContact);
 app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
 app.patch("/contacts/:contactId", FBAuth, updateOneContact);
+app.post("/contacts/:contactId/image", FBAuth, uploadImage);
 
 exports.onDepartmentDelete = functions.firestore
   .document("/departments/{departmentId}")

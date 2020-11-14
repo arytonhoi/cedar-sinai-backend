@@ -1,4 +1,4 @@
-const { db } = require("../util/admin");
+const { admin, db } = require("../util/admin");
 const { fixFormat } = require("../util/shim");
 
 // get all contacts in database
@@ -105,4 +105,57 @@ exports.updateOneContact = (req, res) => {
       console.error(err);
       return res.status(500).json({ error: err.code });
     });
+};
+
+// upload a profile image
+exports.uploadImage = (req, res) => {
+  const BusBoy = require("busboy");
+  const path = require("path");
+  const os = require("os");
+  const fs = require("fs");
+  const busboy = new BusBoy({ headers: req.headers });
+
+  let imageFileName;
+  let thumbnailFilename;
+  let imageToBeUploaded = {};
+  const contactId = req.params.contactId;
+
+  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+      return res.status(400).json({ error: "Wrong file type submitted" });
+    }
+
+    const imageExtension = filename.split(".")[filename.split(".").length - 1];
+    imageFileName = `${contactId}.${imageExtension}`;
+    thumbnailFilename = `${contactId}_200X200.${imageExtension}`;
+    const filepath = path.join(os.tmpdir(), imageFileName);
+    imageToBeUploaded = { filepath, mimetype };
+    file.pipe(fs.createWriteStream(filepath));
+  });
+
+  busboy.on("finish", () => {
+    admin
+      .storage()
+      .bucket()
+      .upload(imageToBeUploaded.filepath, {
+        resumable: false,
+        metadata: {
+          metadata: {
+            contentType: imageToBeUploaded.mimetype,
+          },
+        },
+      })
+      .then(() => {
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${thumbnailFilename}?alt=media`;
+        return db.doc(`/contacts/${contactId}`).update({ imgUrl: imageUrl });
+      })
+      .then(() => {
+        return res.json({ message: "Image uploaded successfully" });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
+  });
+  busboy.end(req.rawBody);
 };
