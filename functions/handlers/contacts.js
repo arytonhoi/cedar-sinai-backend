@@ -127,7 +127,7 @@ exports.uploadImage = (req, res) => {
 
     const imageExtension = filename.split(".")[filename.split(".").length - 1];
     imageFileName = `${contactId}.${imageExtension}`;
-    thumbnailFilename = `${contactId}_200X200.${imageExtension}`;
+    thumbnailFilename = `${contactId}_200x200.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
     imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
