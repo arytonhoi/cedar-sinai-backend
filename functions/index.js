@@ -9,6 +9,8 @@ const { admin, db } = require("./util/admin");
 const { login, getAuthenticatedUser } = require("./handlers/users");
 const FieldValue = admin.firestore.FieldValue;
 
+const { postImage } = require("./handlers/images");
+
 const {
   getAllFolders,
   getFolder,
@@ -36,7 +38,6 @@ const {
   postOneContact,
   deleteOneContact,
   updateOneContact,
-  uploadImage,
 } = require("./handlers/contacts");
 
 // Create and Deploy Your First Cloud Functions
@@ -50,7 +51,10 @@ exports.api = functions.https.onRequest(app);
 app.post("/login", login);
 app.get("/user", FBAuth, getAuthenticatedUser);
 
-// file routes
+// image routes
+app.post("/images", FBAuth, postImage);
+
+// folder routes
 app.get("/folders", FBAuth, getAllFolders);
 app.get("/folders/:folderId", FBAuth, getFolder);
 app.post("/folders/:folderId", FBAuth, createFolder);
@@ -72,7 +76,6 @@ app.get("/contacts", FBAuth, getAllContacts);
 app.post("/contacts", FBAuth, postOneContact);
 app.delete("/contacts/:contactId", FBAuth, deleteOneContact);
 app.patch("/contacts/:contactId", FBAuth, updateOneContact);
-app.post("/contacts/:contactId/image", FBAuth, uploadImage);
 
 exports.onDepartmentDelete = functions.firestore
   .document("/departments/{departmentId}")
