@@ -23,8 +23,8 @@ exports.postImage = (req, res) => {
     const date = new Date();
     const random_num = Math.round(Math.random() * 1000000000000);
     const imageExtension = filename.split(".")[filename.split(".").length - 1];
-    const imageFileNamePrefix = `${date.getTime()}_${random_num}.${imageExtension}`;
-    thumbnailFilename = `${imageFileNamePrefix}_1080x1080.${imageExtension}`;
+    const imageFileNamePrefix = `${date.getTime()}_${random_num}`;
+    thumbnailFilename = `${imageFileNamePrefix}.${imageExtension}`;
     const filepath = path.join(
       os.tmpdir(),
       `${imageFileNamePrefix}.${imageExtension}`
