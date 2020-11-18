@@ -75,6 +75,11 @@ exports.updatePassword = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
+
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ error: "User unauthorized to change account password" });
+  }
+
   // turn username into email
   const user = {
     email: req.body.username.concat("@email.com"),

@@ -31,7 +31,6 @@ exports.postOneAnnouncement = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  console.log(req.user.isAdmin);
   if (!req.user.isAdmin) {
     return res.status(403).json({ error: "Unathorized" });
   } else if (req.method !== "POST") {
@@ -94,7 +93,7 @@ exports.updateOneAnnouncement = (req, res) => {
     author: req.body.author,
     title: req.body.title,
     isPinned: req.body.isPinned,
-    content: req.body.content
+    content: req.body.content,
   };
 
   db.doc(`/announcements/${req.params.announcementId}`)
