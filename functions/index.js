@@ -6,7 +6,11 @@ app.use(cors());
 
 const FBAuth = require("./util/fbAuth");
 const { admin, db } = require("./util/admin");
-const { login, getAuthenticatedUser } = require("./handlers/users");
+const {
+  login,
+  getAuthenticatedUser,
+  updatePassword,
+} = require("./handlers/users");
 const FieldValue = admin.firestore.FieldValue;
 
 const { postImage } = require("./handlers/images");
@@ -50,6 +54,7 @@ exports.api = functions.https.onRequest(app);
 // user routes
 app.post("/login", login);
 app.get("/user", FBAuth, getAuthenticatedUser);
+app.patch("/user/password", FBAuth, updatePassword);
 
 // image routes
 app.post("/images", FBAuth, postImage);
