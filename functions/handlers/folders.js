@@ -89,6 +89,7 @@ exports.searchFolders = (req, res) => {
 
 // get single folder
 exports.getFolder = (req, res) => {
+//   return res.status(400).json({ error: req.query });
   if (req.method !== "GET") {
     return res.status(400).json({ error: "Method not allowed" });
   }
@@ -101,6 +102,12 @@ exports.getFolder = (req, res) => {
       }
       folderData = doc.data();
       folderData.id = doc.id;
+      // maybe increment folder contents
+      if(typeof(req.query.i)==="string"){
+        db.doc(`/folders/${req.params.folderId}`).update({
+          visits: admin.firestore.FieldValue.increment(1)
+        })
+      }
       // get all folder contents
       return db
         .collection("folders")
