@@ -155,6 +155,9 @@ exports.createFolder = (req, res) => {
     lastModified: new Date().toISOString(),
     title: folderTitle,
     content: "",
+    preferredSort: 0,
+    index: 0,
+    visits: 0,
   };
 
   // add newFolder to FB database
@@ -216,33 +219,40 @@ exports.updateOneFolder = (req, res) => {
   try {
     req = fixFormat(req);
   } catch (e) {
-    return res.status(400).json({ error: "Invalid JSON." });
+    return res.status(400).json({ error: err.code });
   }
-
-  try {
-    const updatedFolderId = req.params.folderId;
-    const updatedFolder = {
-      parent: req.body.parent,
-      title: req.body.title,
-      content: req.body.content,
-      lastModified: new Date().toISOString(),
-    };
-    const updatedFolderPathObj = {
-      parentId: req.body.parent,
-      name: req.body.title,
-    };
-    const folderRef = db.doc(`/folders/${updatedFolderId}`);
-    const folderPathsMapRef = db.collection("paths").doc("folders");
-    const batch = db.batch();
-    batch.update(folderRef, updatedFolder);
-    batch.update(folderPathsMapRef, {
-      [updatedFolderId]: updatedFolderPathObj,
-    });
-    return batch.commit().then(() => {
-      return res.json({ message: "Folder updated successfully " });
-    });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.code });
+  if(Object.keys(req.body).length > 0){
+    try {
+      const folderToUpdate = req.params.folderId;
+      const updatedFolderContents = {
+        ...req.body,
+        lastModified: new Date().toISOString()
+      };
+      var updatedFolderPathObj = {}
+      if(typeof(req.body.parent)==="string"||typeof(req.body.parent)==="number"){
+        updatedFolderPathObj.parentId = req.body.parent
+      }
+      if(typeof(req.body.title)==="string"||typeof(req.body.title)==="number"){
+        updatedFolderPathObj.name = req.body.title
+      }
+      const folderRef = db.doc(`/folders/${folderToUpdate}`);
+      const folderPathsMapRef = db.collection("paths").doc("folders");
+      const batch = db.batch();
+      batch.update(folderRef, updatedFolderContents);
+      if(typeof(req.body.parent)==="string"||typeof(req.body.parent)==="number"){
+        batch.update(folderPathsMapRef, {[`${folderToUpdate}.parentId`]: req.body.parent})
+      }
+      if(typeof(req.body.title)==="string"||typeof(req.body.title)==="number"){
+        batch.update(folderPathsMapRef, {[`${folderToUpdate}.name`]: req.body.title})
+      }
+      return batch.commit().then(() => {
+        return res.json({ message: "Folder updated successfully." });
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    }
+  }else{
+    return res.json({ message: "No changes were made." });
   }
 };

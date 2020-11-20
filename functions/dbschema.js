@@ -115,6 +115,9 @@ let db = {
     {
       folderId: "home",
       parent: "home",
+      preferredSort: 0,
+      index: 0,
+      visits: 0,
       path: [],
       createdAt: "2020-09-18T13:49:18.602Z",
       lastModified: "2020-09-18T13:49:18.602Z",
@@ -127,6 +130,9 @@ let db = {
       path: [
         "home"
       ],
+      preferredSort: 0,
+      index: 0,
+      visits: 0,
       createdAt: "2020-09-18T13:49:18.602Z",
       lastModified: "2020-09-18T13:49:18.602Z",
       title: "Folder 1",
@@ -139,6 +145,9 @@ let db = {
         "home",
         "folder1"
       ],
+      preferredSort: 0,
+      index: 0,
+      visits: 0,
       createdAt: "2020-09-18T13:49:18.602Z",
       lastModified: "2020-09-18T13:49:18.602Z",
       title: "Folder 2",
