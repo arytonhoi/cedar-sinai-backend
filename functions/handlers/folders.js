@@ -39,6 +39,54 @@ exports.getAllFolders = (req, res) => {
     });
 };
 
+// temporary serach
+exports.searchFolders = (req, res) => {
+  if (req.method !== "GET") {
+    return res.status(400).json({ error: "Method not allowed" });
+  }
+  const searchTerm = `${req.params.searchTerm}`;
+  // global case insensitive matching
+  var regex = new RegExp(searchTerm, "gi");
+  db.collection("folders")
+    .orderBy("lastModified", "desc")
+    .get()
+    .then((data) => {
+      let folders = [];
+      data.forEach((doc) => {
+        let folder = doc.data();
+        folder.id = doc.id;
+
+        let relevanceCount = 0;
+        let titleMatchesArray = folder.title.match(regex);
+        let contentMatchesArray = folder.content.match(regex);
+        if (titleMatchesArray !== null) {
+          relevanceCount += 2 * titleMatchesArray.length;
+        }
+        if (contentMatchesArray !== null) {
+          relevanceCount += contentMatchesArray.length;
+        }
+
+        if (relevanceCount !== 0) {
+          folder.relevanceCount = relevanceCount;
+          folders.push(folder);
+        }
+      });
+      folders.sort((a, b) =>
+        a.relevanceCount < b.relevanceCount
+          ? 1
+          : b.relevanceCount < a.relevanceCount
+          ? -1
+          : 0
+      );
+      console.log(folders);
+      return res.json(folders);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: err.code });
+    });
+};
+
 // get single folder
 exports.getFolder = (req, res) => {
   if (req.method !== "GET") {

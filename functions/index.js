@@ -21,6 +21,7 @@ const {
   createFolder,
   deleteFolder,
   updateOneFolder,
+  searchFolders,
 } = require("./handlers/folders");
 
 const {
@@ -62,6 +63,7 @@ app.post("/images", FBAuth, postImage);
 // folder routes
 app.get("/folders", FBAuth, getAllFolders);
 app.get("/folders/:folderId", FBAuth, getFolder);
+app.get("/folders/search/:searchTerm", FBAuth, searchFolders);
 app.post("/folders/:folderId", FBAuth, createFolder);
 app.delete("/folders/:folderId", FBAuth, deleteFolder);
 app.patch("/folders/:folderId", FBAuth, updateOneFolder);
