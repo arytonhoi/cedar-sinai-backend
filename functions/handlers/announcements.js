@@ -38,14 +38,17 @@ exports.postOneAnnouncement = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newAnnouncement = {
-    title: req.body.title,
-    author: req.body.author,
-    createdAt: new Date().toISOString(),
-    isPinned: req.body.isPinned,
-    content: req.body.content,
-  };
-
+  try{
+    const newAnnouncement = {
+      title: req.body.title,
+      author: req.body.author,
+      createdAt: new Date().toISOString(),
+      isPinned: req.body.isPinned,
+      content: req.body.content,
+    };
+  }catch(e){
+    return res.status(400).json({ error: "JSON incomplete. Required keys are title, author, isPinned and content" });
+  }
   // add newAnnouncement to FB database and update parent folder
   db.collection("announcements")
     .add(newAnnouncement)
@@ -89,20 +92,21 @@ exports.updateOneAnnouncement = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  const updatedAnnouncement = {
-    author: req.body.author,
-    title: req.body.title,
-    isPinned: req.body.isPinned,
-    content: req.body.content,
-  };
-
-  db.doc(`/announcements/${req.params.announcementId}`)
-    .update(updatedAnnouncement)
-    .then(() => {
-      return res.json({ message: "Announcement updated successfully " });
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  if(Object.keys(req.body).length > 0){
+    var updatedAnnouncement = {
+      ...req.body
+    };
+    delete updatedAnnouncement.createdAt
+    db.doc(`/announcements/${req.params.announcementId}`)
+      .update(updatedAnnouncement)
+      .then(() => {
+        return res.json({ message: "Announcement updated successfully " });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
+  }else{
+    return res.json({ message: "No changes were made." });
+  }
 };
