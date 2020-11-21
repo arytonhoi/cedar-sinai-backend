@@ -14,12 +14,16 @@ exports.login = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
+  var user = {
+      email: "",
+      password: "",
+    };
   // turn username into email
   try{
-  const user = {
-    email: req.body.username.concat("@email.com"),
-    password: req.body.password,
-  };
+    user = {
+      email: req.body.username.toString().concat("@email.com"),
+      password: req.body.password.toString(),
+    };
   }catch(e){
     return res.status(400).json({ error: "Incomplete JSON, username and password fields required." });
   }
