@@ -45,6 +45,7 @@ exports.searchFolders = (req, res) => {
     return res.status(400).json({ error: "Method not allowed" });
   }
   const searchTerm = `${req.params.searchTerm}`;
+  const folderPathsMapRef = db.collection("paths").doc("folders");
   // global case insensitive matching
   var regex = new RegExp(searchTerm, "gi");
   db.collection("folders")
@@ -52,34 +53,37 @@ exports.searchFolders = (req, res) => {
     .get()
     .then((data) => {
       let folders = [];
-      data.forEach((doc) => {
-        let folder = doc.data();
-        folder.id = doc.id;
-
-        let relevanceCount = 0;
-        let titleMatchesArray = folder.title.match(regex);
-        let contentMatchesArray = folder.content.match(regex);
-        if (titleMatchesArray !== null) {
-          relevanceCount += 2 * titleMatchesArray.length;
-        }
-        if (contentMatchesArray !== null) {
-          relevanceCount += contentMatchesArray.length;
-        }
-
-        if (relevanceCount !== 0) {
-          folder.relevanceCount = relevanceCount;
-          folders.push(folder);
-        }
-      });
-      folders.sort((a, b) =>
-        a.relevanceCount < b.relevanceCount
-          ? 1
-          : b.relevanceCount < a.relevanceCount
-          ? -1
-          : 0
-      );
-      console.log(folders);
-      return res.json(folders);
+      folderPathsMapRef.get().then(fpmr=>{
+        fpmrd = fpmr.data()
+        data.forEach((doc) => {
+          let folder = doc.data();
+          folder.id = doc.id;
+          folder.path = getFolderPath(fpmrd, folder.id);
+          let relevanceCount = 0;
+          let titleMatchesArray = folder.title.match(regex);
+          let contentMatchesArray = folder.content.match(regex);
+          if (titleMatchesArray !== null) {
+            relevanceCount += 2 * titleMatchesArray.length;
+          }
+          if (contentMatchesArray !== null) {
+            relevanceCount += contentMatchesArray.length;
+          }
+        
+          if (relevanceCount !== 0) {
+            folder.relevanceCount = relevanceCount;
+            folders.push(folder);
+          }
+        });
+      }).then(x=>{
+        folders.sort((a, b) =>
+          a.relevanceCount < b.relevanceCount
+            ? 1
+            : b.relevanceCount < a.relevanceCount
+            ? -1
+            : 0
+        );
+        return res.json(folders)
+      })
     })
     .catch((err) => {
       console.error(err);
