@@ -38,10 +38,13 @@ exports.postOneDepartment = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newDepartment = {
-    name: req.body.name
-  };
-
+  try{
+    const newDepartment = {
+      name: req.body.name
+    };
+  }catch(e){
+    return res.status(400).json({ error: "JSON incomplete. Required keys are name" });
+  }
   // add newAnn to FB database and update parent folder
   db.collection("departments")
     .add(newDepartment)
@@ -65,13 +68,13 @@ exports.deleteOneDepartment = (req, res) => {
     .get()
     .then((doc) => {
       if (!doc.exists) {
-        return res.status(404).json({ error: "department doesn't exist" });
+        return res.status(404).json({ error: "Cannot delete nonexistent department." });
       } else {
         return department.delete();
       }
     })
     .then(() => {
-      res.json({ message: "department deleted successfully" });
+      res.json({ message: "Department deleted successfully" });
     })
     .catch((err) => {
       console.error(err);
@@ -85,17 +88,21 @@ exports.updateOneDepartment = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  const updatedDepartment = {
-    name: req.body.name,
-  };
+  if(Object.keys(req.body).length > 0){
+    const updatedDepartment = {
+      ...req.body
+    };
 
-  db.doc(`/departments/${req.params.departmentId}`)
-    .update(updatedDepartment)
-    .then(() => {
-      return res.json({ message: "Department updated successfully " });
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+    db.doc(`/departments/${req.params.departmentId}`)
+      .update(updatedDepartment)
+      .then(() => {
+        return res.json({ message: "Department updated successfully " });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
+  }else{
+    return res.json({ message: "No changes were made." });
+  }
 };
