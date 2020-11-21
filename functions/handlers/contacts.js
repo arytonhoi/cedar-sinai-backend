@@ -46,10 +46,10 @@ exports.postOneContact = (req, res) => {
       email: req.body.email,
     };
   }catch(e){
-    return res.status(400).json({ error: "JSON incomplete. Required keys are title, author, isPinned and content" });
+    return res.status(400).json({ error: "JSON incomplete. Required keys are departmentId, name, imgUrl, phone, email" });
   }
 
-  // add newAnn to FB database and update parent folder
+  // add newContact to FB database and update parent folder
   db.collection("contacts")
     .add(newContact)
     .then((doc) => {
