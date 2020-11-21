@@ -37,13 +37,17 @@ exports.postOneContact = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  const newContact = {
-    departmentId: req.body.departmentId,
-    name: req.body.name,
-    imgUrl: req.body.imgUrl,
-    phone: req.body.phone,
-    email: req.body.email,
-  };
+  try{
+    const newContact = {
+      departmentId: req.body.departmentId,
+      name: req.body.name,
+      imgUrl: req.body.imgUrl,
+      phone: req.body.phone,
+      email: req.body.email,
+    };
+  }catch(e){
+    return res.status(400).json({ error: "JSON incomplete. Required keys are title, author, isPinned and content" });
+  }
 
   // add newAnn to FB database and update parent folder
   db.collection("contacts")
@@ -88,21 +92,20 @@ exports.updateOneContact = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  const updatedContact = {
-    name: req.body.name,
-    imgUrl: req.body.imgUrl,
-    departmentId: req.body.departmentId,
-    phone: req.body.phone,
-    email: req.body.email,
-  };
-
-  db.doc(`/contacts/${req.params.contactId}`)
-    .update(updatedContact)
-    .then(() => {
-      return res.json({ message: "Contact updated successfully " });
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({ error: err.code });
-    });
+  if(Object.keys(req.body).length > 0){
+    var updatedContact = {
+      ...req.body
+    };    
+    db.doc(`/contacts/${req.params.contactId}`)
+      .update(updatedContact)
+      .then(() => {
+        return res.json({ message: "Contact updated successfully " });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({ error: err.code });
+      });
+  }else{
+    return res.json({ message: "No changes were made." });
+  }
 };
