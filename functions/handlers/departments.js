@@ -38,24 +38,27 @@ exports.postOneDepartment = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  try{
+  try {
     const newDepartment = {
-      name: req.body.name
+      name: req.body.name,
     };
-  }catch(e){
-    return res.status(400).json({ error: "JSON incomplete. Required keys are name" });
+
+    // add newAnn to FB database and update parent folder
+    db.collection("departments")
+      .add(newDepartment)
+      .then((doc) => {
+        newDepartment.id = doc.id;
+        res.json(newDepartment);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "something went wrong" });
+      });
+  } catch (e) {
+    return res
+      .status(400)
+      .json({ error: "JSON incomplete. Required keys are name" });
   }
-  // add newAnn to FB database and update parent folder
-  db.collection("departments")
-    .add(newDepartment)
-    .then((doc) => {
-      newDepartment.id = doc.id;
-      res.json(newDepartment);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "something went wrong" });
-    });
 };
 
 exports.deleteOneDepartment = (req, res) => {
@@ -68,7 +71,9 @@ exports.deleteOneDepartment = (req, res) => {
     .get()
     .then((doc) => {
       if (!doc.exists) {
-        return res.status(404).json({ error: "Cannot delete nonexistent department." });
+        return res
+          .status(404)
+          .json({ error: "Cannot delete nonexistent department." });
       } else {
         return department.delete();
       }
@@ -88,9 +93,9 @@ exports.updateOneDepartment = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  if(Object.keys(req.body).length > 0){
+  if (Object.keys(req.body).length > 0) {
     const updatedDepartment = {
-      ...req.body
+      ...req.body,
     };
 
     db.doc(`/departments/${req.params.departmentId}`)
@@ -102,7 +107,7 @@ exports.updateOneDepartment = (req, res) => {
         console.error(err);
         return res.status(500).json({ error: err.code });
       });
-  }else{
+  } else {
     return res.json({ message: "No changes were made." });
   }
 };
