@@ -37,7 +37,7 @@ exports.postOneContact = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  try{
+  try {
     const newContact = {
       departmentId: req.body.departmentId,
       name: req.body.name,
@@ -45,21 +45,24 @@ exports.postOneContact = (req, res) => {
       phone: req.body.phone,
       email: req.body.email,
     };
-  }catch(e){
-    return res.status(400).json({ error: "JSON incomplete. Required keys are departmentId, name, imgUrl, phone, email" });
-  }
 
-  // add newContact to FB database and update parent folder
-  db.collection("contacts")
-    .add(newContact)
-    .then((doc) => {
-      newContact.id = doc.id;
-      res.json(newContact);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "something went wrong" });
+    // add newContact to FB database and update parent folder
+    db.collection("contacts")
+      .add(newContact)
+      .then((doc) => {
+        newContact.id = doc.id;
+        res.json(newContact);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "something went wrong" });
+      });
+  } catch (e) {
+    return res.status(400).json({
+      error:
+        "JSON incomplete. Required keys are departmentId, name, imgUrl, phone, email",
     });
+  }
 };
 
 exports.deleteOneContact = (req, res) => {
@@ -92,10 +95,10 @@ exports.updateOneContact = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  if(Object.keys(req.body).length > 0){
+  if (Object.keys(req.body).length > 0) {
     var updatedContact = {
-      ...req.body
-    };    
+      ...req.body,
+    };
     db.doc(`/contacts/${req.params.contactId}`)
       .update(updatedContact)
       .then(() => {
@@ -105,7 +108,7 @@ exports.updateOneContact = (req, res) => {
         console.error(err);
         return res.status(500).json({ error: err.code });
       });
-  }else{
+  } else {
     return res.json({ message: "No changes were made." });
   }
 };

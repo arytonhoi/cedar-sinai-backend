@@ -38,7 +38,7 @@ exports.postOneAnnouncement = (req, res) => {
   }
 
   // move request params to JS object newFIle
-  try{
+  try {
     const newAnnouncement = {
       title: req.body.title,
       author: req.body.author,
@@ -46,20 +46,24 @@ exports.postOneAnnouncement = (req, res) => {
       isPinned: req.body.isPinned,
       content: req.body.content,
     };
-  }catch(e){
-    return res.status(400).json({ error: "JSON incomplete. Required keys are title, author, isPinned and content" });
-  }
-  // add newAnnouncement to FB database and update parent folder
-  db.collection("announcements")
-    .add(newAnnouncement)
-    .then((doc) => {
-      newAnnouncement.id = doc.id;
-      res.json(newAnnouncement);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "something went wrong" });
+
+    // add newAnnouncement to FB database and update parent folder
+    db.collection("announcements")
+      .add(newAnnouncement)
+      .then((doc) => {
+        newAnnouncement.id = doc.id;
+        res.json(newAnnouncement);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: "something went wrong" });
+      });
+  } catch (e) {
+    return res.status(400).json({
+      error:
+        "JSON incomplete. Required keys are title, author, isPinned and content",
     });
+  }
 };
 
 exports.deleteOneAnnouncement = (req, res) => {
@@ -92,11 +96,11 @@ exports.updateOneAnnouncement = (req, res) => {
   } catch (e) {
     return res.status(400).json({ error: "Invalid JSON." });
   }
-  if(Object.keys(req.body).length > 0){
+  if (Object.keys(req.body).length > 0) {
     var updatedAnnouncement = {
-      ...req.body
+      ...req.body,
     };
-    delete updatedAnnouncement.createdAt
+    delete updatedAnnouncement.createdAt;
     db.doc(`/announcements/${req.params.announcementId}`)
       .update(updatedAnnouncement)
       .then(() => {
@@ -106,7 +110,7 @@ exports.updateOneAnnouncement = (req, res) => {
         console.error(err);
         return res.status(500).json({ error: err.code });
       });
-  }else{
+  } else {
     return res.json({ message: "No changes were made." });
   }
 };
