@@ -2,12 +2,15 @@ const functions = require("firebase-functions");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const cookies = require("cookie-parser");
 app.use(cors());
+app.use(cookies());
 
 const FBAuth = require("./util/fbAuth");
 const { admin, db } = require("./util/admin");
 const {
   login,
+  logout,
   getAuthenticatedUser,
   updatePassword,
 } = require("./handlers/users");
@@ -54,6 +57,7 @@ exports.api = functions.https.onRequest(app);
 
 // user routes
 app.post("/login", login);
+app.post("/logout", logout);
 app.get("/user", FBAuth, getAuthenticatedUser);
 app.patch("/user/password", FBAuth, updatePassword);
 
