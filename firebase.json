@@ -1,15 +1,15 @@
-{
-  "hosting": {
-    "public": "public",
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "function": "app"
-      },
-      {
-        "source": "!/@(api)/**",
-        "destination": "/index.html"
-      }
-    ]
-  }
-}
+// {
+//   "hosting": {
+//     "public": "functions",
+//     "rewrites": [
+//       {
+//         "source": "/api/**",
+//         "function": "app"
+//       },
+//       {
+//         "source": "!/@(api)/**",
+//         "destination": "/index.html"
+//       }
+//     ]
+//   }
+// }
