@@ -1,1 +1,14 @@
-{}
+{
+  "hosting": {
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "app"
+      },
+      {
+        "source": "!/@(api)/**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
